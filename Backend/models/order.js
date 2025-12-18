@@ -1,22 +1,13 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema(
+const orderSchema = mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    orderItems: Array,
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    orderItems: [],
     totalPrice: Number,
-    isPaid: Boolean,
-    paidAt: Date,
-    status: {
-      type: String,
-      default: "Pending",
-    },
+    isPaid: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
-const Order = mongoose.model("Order", orderSchema);
-export default Order;
+export default mongoose.model("Order", orderSchema);

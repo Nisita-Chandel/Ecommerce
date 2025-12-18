@@ -1,11 +1,33 @@
-console.log("🔥 AUTH ROUTES FILE LOADED 🔥");
-
 import express from "express";
-import { signup, login } from "../controllers/auth.controller.js";
+import User from "../models/user.js";
 
 const router = express.Router();
 
-router.post("/signup", signup);
-router.post("/login", login);
+// 🔴 TEMP ROUTE – DELETE AFTER USE
+router.post("/create-admin", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const adminExists = await User.findOne({ email });
+    if (adminExists) {
+      return res.status(400).json({ message: "Admin already exists" });
+    }
+
+    const admin = await User.create({
+      name,
+      email,
+      password,
+      isAdmin: true,
+    });
+
+    res.json({
+      _id: admin._id,
+      email: admin.email,
+      isAdmin: admin.isAdmin,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 export default router;

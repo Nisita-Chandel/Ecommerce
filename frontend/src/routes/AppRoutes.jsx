@@ -22,6 +22,11 @@ import SignupPage from "../pages/SignupPage.jsx";
 import GoogleSuccess from "../pages/GoogleSuccess.jsx";
 import MenProductDetails from "../pages/MenProductDetails.jsx";
 import BeautyProductDetails from "../pages/BeautyProductDetails.jsx";
+import AdminAddProduct from "../pages/AdminAddProduct.jsx";
+import AdminProducts from "../pages/AdminProducts.jsx";
+import AdminLogin from "../pages/AdminLogin.jsx";
+import AdminDashboard from "../pages/AdminDashboard.jsx";
+import AdminOrders from "../pages/AdminOrders.jsx";
 
 
 const AppRoutes = () => {
@@ -52,6 +57,15 @@ const AppRoutes = () => {
         <Route path="/kids-product-details" element={<KidsProductDetails />} />
 
         <Route path="/beauty" element={<BeautyPage />} />
+        <Route path="/admin/add-product" element={<AdminAddProduct />} />
+
+        <Route path="/admin/products" element={<AdminProducts />} />
+
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+        <Route path="/admin/orders" element={<AdminOrders />} />
+
 
         <Route
   path="/beauty-product-details"

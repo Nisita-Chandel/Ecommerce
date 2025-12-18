@@ -1,11 +1,15 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Search, User, Heart, ShoppingBag } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // ✅ MOVE TOKEN INSIDE COMPONENT
+  const token = localStorage.getItem("token");
 
   const cartItems = useSelector((state) => state.cart.items);
   const favoriteItems = useSelector((state) => state.favorites.items);
@@ -26,6 +30,7 @@ const Navbar = () => {
     <header className="mt-4 sticky top-0 z-50 bg-white shadow-sm">
       <nav className="max-w-6xl mx-auto px-2 py-2 flex items-center gap-8">
 
+        {/* LOGO */}
         <Link to="/" className="flex items-center shrink-0">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/5/53/H%26M-Logo.svg"
@@ -34,6 +39,7 @@ const Navbar = () => {
           />
         </Link>
 
+        {/* NAV LINKS */}
         <div className="flex items-center gap-6">
           <NavLink to="/" end className={({ isActive }) => `${linkBase} ${isActive ? active : inactive}`}>Home</NavLink>
           <NavLink to="/ladies" className={({ isActive }) => `${linkBase} ${isActive ? active : inactive}`}>Ladies</NavLink>
@@ -42,6 +48,7 @@ const Navbar = () => {
           <NavLink to="/beauty" className={({ isActive }) => `${linkBase} ${isActive ? active : inactive}`}>Beauty</NavLink>
         </div>
 
+        {/* RIGHT ICONS */}
         <div className="ml-auto flex items-center gap-5">
 
           <Link to="/search">
@@ -69,6 +76,7 @@ const Navbar = () => {
             )}
           </Link>
 
+          {/* USER ICON */}
           {user ? (
             <button onClick={logout}>
               <User size={22} />
@@ -79,6 +87,23 @@ const Navbar = () => {
             </Link>
           )}
         </div>
+
+        {/* ✅ ADMIN SECTION (NO UI CHANGE) */}
+        <div className="space-x-4">
+          {!token ? (
+            <Link to="/admin/login" className="font-semibold text-sm">
+              Admin
+            </Link>
+          ) : (
+            <button
+              onClick={() => navigate("/admin/dashboard")}
+              className="font-semibold text-sm"
+            >
+              Admin Dashboard
+            </button>
+          )}
+        </div>
+
       </nav>
     </header>
   );

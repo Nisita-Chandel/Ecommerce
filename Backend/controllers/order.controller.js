@@ -1,5 +1,5 @@
 // controllers/order.controller.js
-import Order from "../models/Order.js";
+import Order from "../models/order.js";
 
 export const createOrder = async (req, res) => {
   const { orderItems, shippingAddress, paymentMethod, totalPrice } = req.body;
@@ -22,5 +22,9 @@ export const createOrder = async (req, res) => {
 
 export const getMyOrders = async (req, res) => {
   const orders = await Order.find({ user: req.user._id });
+  res.json(orders);
+};
+export const getOrders = async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 });
   res.json(orders);
 };

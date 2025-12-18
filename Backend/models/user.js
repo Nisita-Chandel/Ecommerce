@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema(
+const userSchema = mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
+    name: String,
     email: {
       type: String,
       required: true,
@@ -13,9 +11,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-    },
-    googleId: {
-      type: String,
+      required: true,
     },
     isAdmin: {
       type: Boolean,
@@ -25,5 +21,19 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
+// 🔐 Hash password before save
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+// 🔑 Match password
+userSchema.methods.matchPassword = function (enteredPassword) {
+  return bcrypt.compare(enteredPassword, this.password);
+};
+
+// ✅ PREVENT OverwriteModelError
+const User =
+  mongoose.models.User || mongoose.model("User", userSchema);
+
 export default User;
