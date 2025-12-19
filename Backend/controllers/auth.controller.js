@@ -1,59 +1,56 @@
-import User from "../models/user.js";
-import bcrypt from "bcryptjs";
+import Admin from "../models/Admin.js";
 import jwt from "jsonwebtoken";
 
-// SIGNUP
-export const signup = async (req, res) => {
+// ================= CREATE ADMIN (RUN ONCE) =================
+export const createAdmin = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+    const adminExists = await Admin.findOne({ email });
+    if (adminExists) {
+      return res.status(400).json({ message: "Admin already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const admin = await Admin.create({ name, email, password });
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
+    res.status(201).json({
+      message: "Admin created successfully",
+      admin,
     });
-
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.status(201).json({ token, user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// LOGIN  ✅ MUST BE NAMED EXPORT
-export const login = async (req, res) => {
+// ================= ADMIN LOGIN =================
+export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await admin.matchPassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
-      { id: user._id },
+      { id: admin._id, role: "admin" },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    res.json({ token, user });
+    res.json({
+      token,
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -1,32 +1,28 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user.js";
 
-// 🔐 CHECK LOGIN
-export const protect = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+// ADMIN PROTECT MIDDLEWARE
+export const adminProtect = (req, res, next) => {
+  let token;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Not authorized, no token" });
-  }
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
 
-  try {
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // attach user to request
-    req.user = await User.findById(decoded.id).select("-password");
+      if (decoded.role !== "admin") {
+        return res.status(403).json({ message: "Not authorized as admin" });
+      }
 
-    next();
-  } catch (error) {
-    res.status(401).json({ message: "Token invalid" });
-  }
-};
-
-// 🔐 CHECK ADMIN
-export const adminOnly = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
-    next();
+      req.admin = decoded;
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
   } else {
-    res.status(403).json({ message: "Admin access only" });
+    return res.status(401).json({ message: "No token provided" });
   }
 };
