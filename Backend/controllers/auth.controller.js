@@ -1,10 +1,14 @@
 import Admin from "../models/Admin.js";
 import jwt from "jsonwebtoken";
 
-// ================= CREATE ADMIN (RUN ONCE) =================
+// ================= CREATE ADMIN =================
 export const createAdmin = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
     const adminExists = await Admin.findOne({ email });
     if (adminExists) {
@@ -15,7 +19,11 @@ export const createAdmin = async (req, res) => {
 
     res.status(201).json({
       message: "Admin created successfully",
-      admin,
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

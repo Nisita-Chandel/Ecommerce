@@ -6,10 +6,7 @@ import {
 
 const router = express.Router();
 
-// CREATE ADMIN (RUN ONCE)
 router.post("/create-admin", createAdmin);
-
-// ADMIN LOGIN
 router.post("/admin/login", adminLogin);
 
 export default router;

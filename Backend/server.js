@@ -1,16 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "./config/db.js";
 import session from "express-session";
 import passport from "./config/passport.js";
 import "./auth/google.js";
 
-import paymentRoutes from "./routes/payment.js";
+import connectDB from "./config/db.js";
 import productRoutes from "./routes/product.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import orderRoutes from "./routes/order.routes.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import paymentRoutes from "./routes/payment.js";
+import errorHandler from "./middleware/errorMiddleware.js";
 
 // Load environment variables
 dotenv.config();
@@ -38,7 +38,6 @@ app.use(passport.session());
 // Routes
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
-
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 
@@ -46,13 +45,8 @@ app.use("/api/payment", paymentRoutes);
 app.get("/", (req, res) => {
   res.send("HM Backend API is running...");
 });
-app.post("/api/auth/login", (req, res) => {
-  res.json({ message: "LOGIN ROUTE HIT" });
-});
 
-
-// Error handlers
-app.use(notFound);
+// ❗ ERROR HANDLER — MUST BE LAST
 app.use(errorHandler);
 
 // Start server
