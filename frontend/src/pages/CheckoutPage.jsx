@@ -1,8 +1,13 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCart } from "../store/cartSlice";
+import { useNavigate } from "react-router-dom";
+import API from "../api/api";
 
 const CheckoutPage = () => {
   const cartItems = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [customer, setCustomer] = useState({
     name: "",
@@ -38,7 +43,6 @@ const CheckoutPage = () => {
 
   // ✅ PAYMENT HANDLER
   const handlePayment = async () => {
-    // validation
     if (
       !customer.name ||
       !customer.email ||
@@ -54,59 +58,60 @@ const CheckoutPage = () => {
       return;
     }
 
-    // load Razorpay
     const loaded = await loadRazorpay();
     if (!loaded) {
       alert("Razorpay SDK failed to load");
       return;
     }
 
-    let order;
-
+    // 1️⃣ Create Razorpay order
+    let razorpayOrder;
     try {
       const res = await fetch("http://localhost:5000/api/payment/order", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: total }),
       });
 
-      if (!res.ok) {
-        throw new Error("Order creation failed");
-      }
-
-      order = await res.json();
+      razorpayOrder = await res.json();
     } catch (error) {
-      console.error("Fetch error:", error);
-      alert("Backend not reachable. Please start the server.");
+      alert("Backend not reachable");
       return;
     }
 
-    // Razorpay options
+    // 2️⃣ Razorpay options
     const options = {
-      key: "rzp_test_Rqz6mQTZRldpAy", // frontend key only
-      amount: order.amount,
-      currency: order.currency,
+      key: "rzp_test_Rqz6mQTZRldpAy", // frontend key
+      amount: razorpayOrder.amount,
+      currency: razorpayOrder.currency,
       name: "H&M Clone",
       description: "Order Payment",
-      order_id: order.id,
+      order_id: razorpayOrder.id,
+
       prefill: {
         name: customer.name,
         email: customer.email,
         contact: customer.phone,
       },
-      handler: function (response) {
-        alert("Payment Successful 🎉");
 
-        console.log("Payment ID:", response.razorpay_payment_id);
-        console.log("Order ID:", response.razorpay_order_id);
-        console.log("Signature:", response.razorpay_signature);
-        console.log("Customer:", customer);
+      handler: async function () {
+        try {
+          // ✅ SAVE ORDER TO DATABASE
+          await API.post("/orders", {
+            items: cartItems,
+            total,
+          });
+
+          dispatch(clearCart());
+          alert("Payment Successful 🎉 Order placed!");
+
+          navigate("/");
+        } catch (error) {
+          alert("Order save failed");
+        }
       },
-      theme: {
-        color: "#000000",
-      },
+
+      theme: { color: "#000000" },
     };
 
     const rzp = new window.Razorpay(options);

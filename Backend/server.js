@@ -11,6 +11,10 @@ import authRoutes from "./routes/auth.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import paymentRoutes from "./routes/payment.js";
 import errorHandler from "./middleware/errorMiddleware.js";
+import adminRoutes from "./routes/admin.routes.js";
+import adminProductRoutes from "./routes/adminProduct.routes.js";
+import adminOrderRoutes from "./routes/adminOrder.routes.js";
+
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +44,11 @@ app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/admin", adminProductRoutes);
+app.use("/api/admin", adminOrderRoutes);
+
+
 
 // Test route
 app.get("/", (req, res) => {

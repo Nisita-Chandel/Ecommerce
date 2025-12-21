@@ -1,11 +1,13 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
+// layouts
 import HomeLayout from "../components/layout/HomeLayout.jsx";
+import AdminLayout from "../components/layout/AdminLayout.jsx";
 
+// user pages
 import HomePage from "../pages/HomePage.jsx";
-import HomeProductDetails from "../pages/HomeProductDetails.jsx";
-
+import ProductDetails from "../pages/ProductDetails.jsx";
 import CartPage from "../pages/CartPage.jsx";
 import CheckoutPage from "../pages/CheckoutPage.jsx";
 import SearchPage from "../pages/SearchPage.jsx";
@@ -13,71 +15,49 @@ import FavoritePage from "../pages/FavoritePage.jsx";
 import LadiesPage from "../pages/LadiesPage.jsx";
 import MenPage from "../pages/MenPage.jsx";
 import KidsPage from "../pages/KidsPage.jsx";
-import KidsProductDetails from "../pages/KidsProductDetails.jsx";
-import ProductDetails from "../pages/ProductDetails.jsx";
 import BeautyPage from "../pages/BeautyPage.jsx";
-
 import LoginPage from "../pages/LoginPage.jsx";
 import SignupPage from "../pages/SignupPage.jsx";
 import GoogleSuccess from "../pages/GoogleSuccess.jsx";
-import MenProductDetails from "../pages/MenProductDetails.jsx";
-import BeautyProductDetails from "../pages/BeautyProductDetails.jsx";
-import AdminAddProduct from "../pages/AdminAddProduct.jsx";
-import AdminProducts from "../pages/AdminProducts.jsx";
+
+// admin pages
 import AdminLogin from "../pages/AdminLogin.jsx";
 import AdminDashboard from "../pages/AdminDashboard.jsx";
+import AdminProducts from "../pages/AdminProducts.jsx";
 import AdminOrders from "../pages/AdminOrders.jsx";
-
 
 const AppRoutes = () => {
   return (
     <Routes>
 
-      {/* PAGES WITH NAVBAR */}
+      {/* ================= USER AREA ================= */}
       <Route element={<HomeLayout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/home/:id" element={<HomeProductDetails />} />
-
-
-
-        {/* ✅ FIXED ROUTE */}
         <Route path="/product/:id" element={<ProductDetails />} />
-
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/favorite" element={<FavoritePage />} />
         <Route path="/ladies" element={<LadiesPage />} />
         <Route path="/men" element={<MenPage />} />
-
-        <Route path="/men/:id" element={<MenProductDetails />} />
-
-
         <Route path="/kids" element={<KidsPage />} />
-        <Route path="/kids-product-details" element={<KidsProductDetails />} />
-
         <Route path="/beauty" element={<BeautyPage />} />
-        <Route path="/admin/add-product" element={<AdminAddProduct />} />
-
-        <Route path="/admin/products" element={<AdminProducts />} />
-
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-
-        <Route path="/admin/orders" element={<AdminOrders />} />
-
-
-        <Route
-  path="/beauty-product-details"
-  element={<BeautyProductDetails />}
-/>
-
         <Route path="/google-success" element={<GoogleSuccess />} />
       </Route>
 
-      {/* AUTH */}
+      {/* ================= AUTH ================= */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+
+      {/* ================= ADMIN LOGIN ================= */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+
+      {/* ================= ADMIN AREA ================= */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="orders" element={<AdminOrders />} />
+      </Route>
 
     </Routes>
   );

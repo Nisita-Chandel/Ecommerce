@@ -1,84 +1,71 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
 
 const AdminDashboard = () => {
-  const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    products: 0,
-    orders: 0,
-  });
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [ordersData, setOrdersData] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) navigate("/admin/login");
-
-    const fetchStats = async () => {
-      const products = await API.get("/products");
-      const orders = await API.get("/orders");
-
-      setStats({
-        products: products.data.length,
-        orders: orders.data.length,
-      });
+    const fetchAnalytics = async () => {
+      const { data } = await API.get("/admin/analytics");
+      setTotalProducts(data.totalProducts);
+      setOrdersData(
+        data.ordersByDay.map((item) => ({
+          date: item._id,
+          orders: item.totalOrders,
+        }))
+      );
     };
 
-    fetchStats();
-  }, [navigate]);
-
-  const chartData = [
-    { name: "Products", count: stats.products },
-    { name: "Orders", count: stats.orders },
-  ];
+    fetchAnalytics();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* HEADER */}
-      <div className="bg-black text-white p-4 flex justify-between">
-        <h1 className="text-xl font-semibold">HM Admin Dashboard</h1>
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            navigate("/admin/login");
-          }}
-          className="bg-red-600 px-3 py-1 rounded"
-        >
-          Logout
-        </button>
-      </div>
+    <div>
+      <h2 className="text-2xl font-semibold mb-6">Admin Dashboard</h2>
 
       {/* STATS */}
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-6 mb-10">
         <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-lg font-semibold">Total Products</h2>
-          <p className="text-3xl">{stats.products}</p>
+          <h3 className="text-lg font-semibold">Total Products</h3>
+          <p className="text-3xl mt-2">{totalProducts}</p>
         </div>
 
         <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-lg font-semibold">Total Orders</h2>
-          <p className="text-3xl">{stats.orders}</p>
+          <h3 className="text-lg font-semibold">Orders (Last 7 Days)</h3>
+          <p className="text-3xl mt-2">
+            {ordersData.reduce((a, b) => a + b.orders, 0)}
+          </p>
         </div>
       </div>
 
       {/* CHART */}
-      <div className="bg-white m-6 p-6 rounded shadow">
-        <h2 className="text-lg font-semibold mb-4">System Overview</h2>
+      <div className="bg-white p-6 rounded shadow">
+        <h3 className="text-lg font-semibold mb-4">
+          Orders Trend (Last 7 Days)
+        </h3>
 
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData}>
-            <XAxis dataKey="name" />
-            <YAxis />
+          <LineChart data={ordersData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis allowDecimals={false} />
             <Tooltip />
-            <Bar dataKey="count" />
-          </BarChart>
+            <Line
+              type="monotone"
+              dataKey="orders"
+              strokeWidth={2}
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>

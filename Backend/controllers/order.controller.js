@@ -1,13 +1,21 @@
 import Order from "../models/Order.js";
 
-// ADMIN: GET ALL ORDERS
-export const getAllOrders = async (req, res) => {
+// ✅ CREATE ORDER
+export const createOrder = async (req, res) => {
   try {
-    const orders = await Order.find({})
-      .populate("user", "name email")
-      .sort({ createdAt: -1 });
+    const { items, total } = req.body;
 
-    res.json(orders);
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: "No order items" });
+    }
+
+    const order = await Order.create({
+      user: req.user._id,     // from auth middleware
+      orderItems: items,
+      totalPrice: total,
+    });
+
+    res.status(201).json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

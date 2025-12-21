@@ -6,5 +6,7 @@ const router = express.Router();
 
 // ADMIN ONLY ROUTE
 router.post("/admin/create", adminProtect, createProduct);
+router.post("/create-product", adminProtect, createProduct);
+
 
 export default router;

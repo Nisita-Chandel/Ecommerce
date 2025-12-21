@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const productSchema = mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
     name: String,
     image: String,
@@ -12,4 +12,8 @@ const productSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Product", productSchema);
+// ✅ PREVENT OverwriteModelError
+const Product =
+  mongoose.models.Product || mongoose.model("Product", productSchema);
+
+export default Product;
