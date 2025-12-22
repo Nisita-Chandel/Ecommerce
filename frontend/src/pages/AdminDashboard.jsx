@@ -1,72 +1,90 @@
 import React, { useEffect, useState } from "react";
-import API from "../api/api";
+import adminAPI from "../api/adminApi";
+
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
   Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend
+);
 
 const AdminDashboard = () => {
   const [totalProducts, setTotalProducts] = useState(0);
-  const [ordersData, setOrdersData] = useState([]);
+  const [ordersByDay, setOrdersByDay] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchAnalytics = async () => {
-      const { data } = await API.get("/admin/analytics");
-      setTotalProducts(data.totalProducts);
-      setOrdersData(
-        data.ordersByDay.map((item) => ({
-          date: item._id,
-          orders: item.totalOrders,
-        }))
-      );
+      try {
+        const { data } = await adminAPI.get("/admin/analytics");
+
+        setTotalProducts(data.totalProducts);
+        setOrdersByDay(data.ordersByDay);
+      } catch (err) {
+        console.error("Analytics error:", err);
+        setError("Failed to load analytics");
+      }
     };
 
     fetchAnalytics();
   }, []);
 
+  const chartData = {
+    labels: ordersByDay.map((item) => item._id),
+    datasets: [
+      {
+        label: "Orders",
+        data: ordersByDay.map((item) => item.totalOrders),
+        borderColor: "black",
+        backgroundColor: "rgba(0,0,0,0.2)",
+        tension: 0.4,
+      },
+    ],
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Admin Dashboard</h2>
 
-      {/* STATS */}
-      <div className="grid grid-cols-2 gap-6 mb-10">
+      {error && <p className="text-red-500">{error}</p>}
+
+      <div className="grid grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-semibold">Total Products</h3>
-          <p className="text-3xl mt-2">{totalProducts}</p>
+          <p className="text-gray-500">Total Products</p>
+          <p className="text-3xl font-bold">{totalProducts}</p>
         </div>
 
         <div className="bg-white p-6 rounded shadow">
-          <h3 className="text-lg font-semibold">Orders (Last 7 Days)</h3>
-          <p className="text-3xl mt-2">
-            {ordersData.reduce((a, b) => a + b.orders, 0)}
+          <p className="text-gray-500">Orders (Last 7 Days)</p>
+          <p className="text-3xl font-bold">
+            {ordersByDay.reduce((sum, o) => sum + o.totalOrders, 0)}
           </p>
         </div>
       </div>
 
-      {/* CHART */}
       <div className="bg-white p-6 rounded shadow">
         <h3 className="text-lg font-semibold mb-4">
           Orders Trend (Last 7 Days)
         </h3>
 
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={ordersData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis allowDecimals={false} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="orders"
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {ordersByDay.length === 0 ? (
+          <p className="text-gray-500">No orders in last 7 days</p>
+        ) : (
+          <Line data={chartData} />
+        )}
       </div>
     </div>
   );

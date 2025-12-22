@@ -16,8 +16,11 @@ const AdminLogin = () => {
         password,
       });
 
-      localStorage.setItem("token", data.token);
-      navigate("/admin/products");
+      // ✅ STORE ADMIN TOKEN CORRECTLY
+      localStorage.setItem("adminToken", data.token);
+      localStorage.removeItem("userToken");
+
+      navigate("/admin/dashboard");
     } catch (error) {
       alert("Invalid admin credentials");
     }

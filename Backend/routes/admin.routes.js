@@ -1,5 +1,5 @@
 import express from "express";
-import Order from "../models/Order.js";
+import Order from "../models/order.js";
 import Product from "../models/product.js";
 import { adminProtect } from "../middleware/adminMiddleware.js";
 
@@ -32,7 +32,7 @@ router.get("/analytics", adminProtect, async (req, res) => {
       { $sort: { _id: 1 } },
     ]);
 
-    res.json({
+    res.status(200).json({
       totalProducts,
       ordersByDay,
     });

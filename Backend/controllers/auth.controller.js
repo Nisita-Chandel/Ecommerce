@@ -42,7 +42,8 @@ export const adminLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: admin._id, role: "admin" },
+      { id: admin._id,
+         role: "admin" },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
