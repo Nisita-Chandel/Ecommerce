@@ -100,13 +100,19 @@ const CheckoutPage = () => {
           await API.post("/orders", {
             items: cartItems,
             total,
+          },{
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           });
 
           dispatch(clearCart());
-          alert("Payment Successful 🎉 Order placed!");
+          alert("Payment Successful 🎉 Order placed");
 
           navigate("/");
         } catch (error) {
+          console.error("ORDER SAVE ERROR 👉", error.response?.data);
+
           alert("Order save failed");
         }
       },

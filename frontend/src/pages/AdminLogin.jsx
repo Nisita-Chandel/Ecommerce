@@ -15,10 +15,10 @@ const AdminLogin = () => {
         email,
         password,
       });
+      console.log("ADMIN LOGIN TOKEN 👉", data.token);
 
       // ✅ STORE ADMIN TOKEN CORRECTLY
-      localStorage.setItem("adminToken", data.token);
-      localStorage.removeItem("userToken");
+      localStorage.setItem("token", data.token);
 
       navigate("/admin/dashboard");
     } catch (error) {

@@ -4,15 +4,19 @@ const API = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
-API.interceptors.request.use((req) => {
-  // 👇 USE USER TOKEN FOR NORMAL APIs
-  const userToken = localStorage.getItem("userToken");
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
 
-  if (userToken) {
-    req.headers.Authorization = `Bearer ${userToken}`;
-  }
+    console.log("SENDING TOKEN 👉", token); // 🔴 DEBUG
 
-  return req;
-});
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default API;

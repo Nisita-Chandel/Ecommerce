@@ -1,31 +1,46 @@
 const BASE_URL = "http://localhost:5000/api/auth";
 
+/* ================= USER SIGNUP ================= */
 export const signupApi = async (data) => {
-  const res = await fetch(`${BASE_URL}/signup`, {
+  const res = await fetch(`${BASE_URL}/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(data),
   });
 
+  const result = await res.json();
+
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Signup failed");
+    throw new Error(result.message || "Signup failed");
   }
 
-  return res.json();
+  return result; // { message, user }
 };
 
+/* ================= USER LOGIN ================= */
 export const loginApi = async (data) => {
   const res = await fetch(`${BASE_URL}/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(data),
   });
 
+  const result = await res.json();
+
+  console.log("LOGIN API RESPONSE 👉", result); // 🔴 DEBUG (IMPORTANT)
+
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Login failed");
+    throw new Error(result.message || "Login failed");
   }
 
-  return res.json();
+  // ✅ ENSURE TOKEN EXISTS
+  if (!result.token) {
+    throw new Error("Token not received from server");
+  }
+
+  return result; // { token }
 };
