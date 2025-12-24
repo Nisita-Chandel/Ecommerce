@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import Admin from "../models/Admin.js";
+
 
 // ================= USER PROTECT =================
 export const protect = async (req, res, next) => {
@@ -37,6 +39,8 @@ export const protect = async (req, res, next) => {
 };
 
 // ================= ADMIN PROTECT =================
+
+// ================= ADMIN PROTECT =================
 export const adminProtect = async (req, res, next) => {
   let token;
 
@@ -49,17 +53,19 @@ export const adminProtect = async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      const user = await User.findById(decoded.id).select("-password");
+      // ✅ ROLE CHECK
+      
+      // ✅ FETCH FROM ADMIN COLLECTION (FIX)
+      const admin = await Admin.findById(decoded.id).select("-password");
 
-      if (!user || !user.isAdmin) {
-        return res
-          .status(403)
-          .json({ message: "Not authorized as admin" });
+      if (!admin) {
+        return res.status(401).json({ message: "Admin not found" });
       }
 
-      req.user = user;
+      req.admin = admin; // attach admin
       next();
     } catch (error) {
+      console.error("ADMIN AUTH ERROR:", error.message);
       return res.status(401).json({ message: "Invalid admin token" });
     }
   } else {
