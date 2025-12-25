@@ -33,23 +33,30 @@ const AdminProducts = () => {
       return;
     }
 
-    if (editingId) {
-      await API.put(`/admin/product/${editingId}`, form);
-    } else {
-      await API.post("/admin/product", form);
+    try {
+      if (editingId) {
+        await API.put(`/admin/product/${editingId}`, form);
+      } else {
+        await API.post("/admin/products", form); // ✅ FIXED
+      }
+    
+      setForm({
+        name: "",
+        image: "",
+        price: "",
+        category: "",
+        rating: "",
+        description: "",
+      });
+    
+      setEditingId(null);
+      fetchProducts();
+    } catch (error) {
+      console.error("PRODUCT SAVE ERROR:", error.response?.data || error);
+      alert("Failed to save product");
     }
-
-    setForm({
-      name: "",
-      image: "",
-      price: "",
-      category: "",
-      rating: "",
-      description: "",
-    });
-    setEditingId(null);
-    fetchProducts();
-  };
+    
+  }
 
   const deleteHandler = async (id) => {
     await API.delete(`/admin/product/${id}`);

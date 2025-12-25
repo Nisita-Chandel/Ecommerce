@@ -1,6 +1,6 @@
 import express from "express";
 import Product from "../models/product.js";
-import { adminProtect } from "../middleware/adminMiddleware.js";
+import { adminProtect } from "../middleware/authMiddleware.js";
 import imagekit from "../config/imagekit.js";
 import upload from "../middleware/uploadMiddleware.js"
 
@@ -28,7 +28,7 @@ router.post(
   );
   
 // ➕ ADD PRODUCT (ADMIN)
-router.post("/product", adminProtect, async (req, res) => {
+router.post("/products", adminProtect, async (req, res) => {
   try {
     const product = await Product.create(req.body);
     res.status(201).json(product);

@@ -1,7 +1,7 @@
 import express from "express";
 import Order from "../models/order.js";
 import Product from "../models/product.js";
-import { adminProtect } from "../middleware/adminMiddleware.js";
+import { adminProtect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

@@ -1,39 +1,27 @@
 import express from "express";
-import Order from "../models/Order.js";
-import { adminProtect } from "../middleware/adminMiddleware.js";
+import Order from "../models/order.js";
+import { adminProtect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// 📦 GET ALL ORDERS (ADMIN)
+// 📦 ALL ORDERS
 router.get("/orders", adminProtect, async (req, res) => {
-  try {
-    const orders = await Order.find()
-      .populate("user", "name email")
-      .sort({ createdAt: -1 });
+  const orders = await Order.find()
+    .populate("user", "name email")
+    .sort({ createdAt: -1 });
 
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  res.json(orders);
 });
 
-// 🔄 UPDATE ORDER STATUS (ADMIN)
+// 🔄 UPDATE STATUS
 router.put("/order/:id/status", adminProtect, async (req, res) => {
-  try {
-    const { status } = req.body;
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
 
-    const order = await Order.findById(req.params.id);
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
+  order.status = req.body.status;
+  await order.save();
 
-    order.status = status;
-    await order.save();
-
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  res.json(order);
 });
 
 export default router;
