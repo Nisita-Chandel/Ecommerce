@@ -1,5 +1,3 @@
-// controllers/product.controller.js
-
 import Product from "../models/product.js";
 
 // ✅ GET ALL PRODUCTS
@@ -27,7 +25,7 @@ export const getProductById = async (req, res) => {
   }
 };
 
-// ✅ CREATE PRODUCT
+// ✅ CREATE PRODUCT (ADMIN)
 export const createProduct = async (req, res) => {
   try {
     const {
@@ -50,12 +48,14 @@ export const createProduct = async (req, res) => {
       image,
     });
 
-    const createdProduct = await Product.save();
+    const createdProduct = await product.save(); // ✅ FIXED
     res.status(201).json(createdProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+// ✅ UPDATE PRODUCT (ADMIN)
 export const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -73,7 +73,7 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// DELETE PRODUCT
+// ✅ DELETE PRODUCT (ADMIN)
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -84,6 +84,27 @@ export const deleteProduct = async (req, res) => {
 
     await product.deleteOne();
     res.json({ message: "Product deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 🔍 SEARCH PRODUCTS
+export const searchProducts = async (req, res) => {
+  try {
+    const keyword = req.query.query;
+
+    if (!keyword) return res.json([]);
+
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: keyword, $options: "i" } },
+        { category: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    });
+
+    res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import API from "../api/api";
+import adminAPI from "../api/api";
 
 const AdminAddProduct = () => {
   const [form, setForm] = useState({
@@ -19,7 +19,7 @@ const AdminAddProduct = () => {
     e.preventDefault();
 
     try {
-      const { data } = await API.post("/products", {
+      const { data } = await adminAPI.post("/products", {
         ...form,
         price: Number(form.price),
         rating: Number(form.rating),
