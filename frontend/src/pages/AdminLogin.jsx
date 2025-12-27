@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import API from "../api/api";
 import { useNavigate } from "react-router-dom";
+import adminAPI from "../api/adminApi";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -11,14 +11,14 @@ const AdminLogin = () => {
     e.preventDefault();
 
     try {
-      const { data } = await API.post("/auth/admin/login", {
+      const { data } = await adminAPI.post("/auth/admin/login", {
         email,
         password,
       });
-      console.log("ADMIN LOGIN TOKEN 👉", data.token);
-
+      
       // ✅ STORE ADMIN TOKEN CORRECTLY
       localStorage.setItem("token", data.token);
+      console.log("ADMIN LOGIN TOKEN 👉", data.token);
 
       navigate("/admin/dashboard");
     } catch (error) {

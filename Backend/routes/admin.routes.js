@@ -5,13 +5,11 @@ import { adminProtect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// 📊 DASHBOARD ANALYTICS
+// ✅ CORRECT
 router.get("/analytics", adminProtect, async (req, res) => {
   try {
-    // Products count
     const totalProducts = await Product.countDocuments();
 
-    // Orders in last 7 days
     const last7Days = new Date();
     last7Days.setDate(last7Days.getDate() - 6);
 
@@ -24,7 +22,10 @@ router.get("/analytics", adminProtect, async (req, res) => {
       {
         $group: {
           _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$createdAt",
+            },
           },
           totalOrders: { $sum: 1 },
         },

@@ -4,19 +4,16 @@ const adminAPI = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
-adminAPI.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
+adminAPI.interceptors.request.use((config) => {
+  const token = localStorage.getItem("adminToken");
 
-    console.log("ADMIN TOKEN 👉", token);
+  console.log("📤 ADMIN TOKEN SENT:", token);
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  return config;
+});
 
 export default adminAPI;
