@@ -11,17 +11,25 @@ const AdminLogin = () => {
     e.preventDefault();
 
     try {
-      const { data } = await adminAPI.post("/auth/admin/login", {
+      // ✅ CORRECT ENDPOINT
+      const { data } = await adminAPI.post("/admin/login", {
         email,
         password,
       });
-      
-      // ✅ STORE ADMIN TOKEN CORRECTLY
-      localStorage.setItem("token", data.token);
-      console.log("ADMIN LOGIN TOKEN 👉", data.token);
+
+      console.log("ADMIN LOGIN RESPONSE 👉", data);
+
+      // ✅ SAVE TOKEN
+      localStorage.setItem("adminToken", data.token);
+
+      console.log(
+        "ADMIN TOKEN AFTER SAVE 👉",
+        localStorage.getItem("adminToken")
+      );
 
       navigate("/admin/dashboard");
     } catch (error) {
+      console.error("LOGIN ERROR:", error.response?.data);
       alert("Invalid admin credentials");
     }
   };

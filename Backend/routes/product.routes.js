@@ -1,5 +1,5 @@
 import express from "express";
-import { adminProtect } from "../middleware/authMiddleware.js";
+import { adminProtect } from "../middleware/adminMiddleware.js";
 import {
   getProducts,
   getProductById,

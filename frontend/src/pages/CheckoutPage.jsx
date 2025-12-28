@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearCart } from "../store/cartSlice";
 import { useNavigate } from "react-router-dom";
-import API from "../api/api";
+import API from "../api/adminApi";
 
 const CheckoutPage = () => {
   const cartItems = useSelector((state) => state.cart.items);

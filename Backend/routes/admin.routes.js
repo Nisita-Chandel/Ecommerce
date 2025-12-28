@@ -1,11 +1,17 @@
 import express from "express";
+import { createAdmin, adminLogin } from "../controllers/admin.controller.js";
+import { adminProtect } from "../middleware/adminMiddleware.js";
 import Order from "../models/order.js";
 import Product from "../models/product.js";
-import { adminProtect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// ✅ CORRECT
+// ================= ADMIN AUTH =================
+router.post("/create-admin", createAdmin); // run once
+router.post("/login", adminLogin);
+
+// ================= ADMIN ANALYTICS =================
+// ⚠️ MUST be before any dynamic routes
 router.get("/analytics", adminProtect, async (req, res) => {
   try {
     const totalProducts = await Product.countDocuments();
@@ -15,9 +21,7 @@ router.get("/analytics", adminProtect, async (req, res) => {
 
     const ordersByDay = await Order.aggregate([
       {
-        $match: {
-          createdAt: { $gte: last7Days },
-        },
+        $match: { createdAt: { $gte: last7Days } },
       },
       {
         $group: {
@@ -38,6 +42,7 @@ router.get("/analytics", adminProtect, async (req, res) => {
       ordersByDay,
     });
   } catch (error) {
+    console.error("ANALYTICS ERROR:", error.message);
     res.status(500).json({ message: error.message });
   }
 });

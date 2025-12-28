@@ -1,74 +1,28 @@
 import express from "express";
-import Product from "../models/product.js";
-import { adminProtect } from "../middleware/authMiddleware.js";
-import imagekit from "../config/imagekit.js";
-import upload from "../middleware/uploadMiddleware.js"
+import { adminProtect } from "../middleware/adminMiddleware.js";
+import {
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "../controllers/product.controller.js";
 
 const router = express.Router();
 
-router.post(
-    "/upload",
-    adminProtect,
-    upload.single("image"),
-    async (req, res) => {
-      try {
-        const file = req.file;
-  
-        const response = await imagekit.upload({
-          file: file.buffer.toString("base64"),
-          fileName: file.originalname,
-          folder: "hm-products",
-        });
-  
-        res.json({ imageUrl: response.url });
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
-    }
-  );
-  
-// ➕ ADD PRODUCT (ADMIN)
-router.post("/products", adminProtect, async (req, res) => {
-  try {
-    const product = await Product.create(req.body);
-    res.status(201).json(product);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 // 📦 GET ALL PRODUCTS (ADMIN)
-router.get("/products", adminProtect, async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+router.get("/", adminProtect, getProducts);
+
+// 📦 GET PRODUCT BY ID (ADMIN)
+router.get("/:id", adminProtect, getProductById);
+
+// ➕ CREATE PRODUCT (ADMIN)
+router.post("/", adminProtect, createProduct);
+
+// ✏️ UPDATE PRODUCT (ADMIN)
+router.put("/:id", adminProtect, updateProduct);
 
 // 🗑 DELETE PRODUCT (ADMIN)
-router.delete("/product/:id", adminProtect, async (req, res) => {
-  try {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "Product deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-// ✏️ UPDATE PRODUCT (ADMIN)
-router.put("/product/:id", adminProtect, async (req, res) => {
-    try {
-      const updatedProduct = await Product.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-      );
-  
-      res.json(updatedProduct);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-  
+router.delete("/:id", adminProtect, deleteProduct);
+
 export default router;
