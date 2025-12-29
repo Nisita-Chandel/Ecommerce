@@ -1,5 +1,6 @@
 import express from "express";
 import { adminProtect } from "../middleware/adminMiddleware.js";
+
 import {
   getProducts,
   getProductById,
@@ -11,18 +12,18 @@ import {
 const router = express.Router();
 
 // 📦 GET ALL PRODUCTS (ADMIN)
-router.get("/", adminProtect, getProducts);
+router.get("/products", adminProtect, getProducts);
 
 // 📦 GET PRODUCT BY ID (ADMIN)
-router.get("/:id", adminProtect, getProductById);
+router.get("/products/:id", adminProtect, getProductById);
 
 // ➕ CREATE PRODUCT (ADMIN)
-router.post("/", adminProtect, createProduct);
+router.post("/products", adminProtect, createProduct);
 
 // ✏️ UPDATE PRODUCT (ADMIN)
-router.put("/:id", adminProtect, updateProduct);
+router.put("/products/:id", adminProtect, updateProduct);
 
 // 🗑 DELETE PRODUCT (ADMIN)
-router.delete("/:id", adminProtect, deleteProduct);
+router.delete("/products/:id", adminProtect, deleteProduct);
 
 export default router;
